@@ -8,8 +8,8 @@
 
         <ImageView
             android:id="@+id/imageView"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
+            android:layout_width="160dp"
+            android:layout_height="160dp"
             android:src="@mipmap/ic_launcher" />
 
         <LinearLayout
@@ -22,7 +22,7 @@
                 android:id="@+id/textView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="이름"
+                android:text="운동 이름"
                 android:textColor="@android:color/holo_blue_dark"
                 android:textSize="30sp"
                 android:textStyle="bold" />
@@ -32,7 +32,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="전화번호"
+                android:text="상세 내용"
                 android:textColor="@android:color/darker_gray"
                 android:textSize="24sp" />
         </LinearLayout>

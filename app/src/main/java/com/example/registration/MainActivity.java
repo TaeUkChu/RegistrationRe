@@ -2,6 +2,7 @@ package com.example.registration;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import android.content.Intent;
 import android.graphics.Color;
@@ -35,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     public static String userperiod;
     private AlertDialog dialog; // 알림창
     ImageView[] imageViews = new ImageView[5];
+    TextView textView;
     Congestion congestion = new Congestion();
 
     @Override
@@ -136,7 +138,6 @@ public class MainActivity extends AppCompatActivity {
         //에러발생
         RefactButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                TextView TextView = findViewById(R.id.numbertext);
                 Response.Listener<String> responseListener = new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -154,11 +155,10 @@ public class MainActivity extends AppCompatActivity {
                                         .create();
                                 dialog.show();  //다이얼로그 실행
                                 int temp = Integer.parseInt(sum) * 5;
-                                TextView.setText("[현재 인원 (명) (%)]\n [" + sum + "명 / 20명] [" + Integer.toString(temp) + "%]");
+                                textView.setText("[현재 인원 (명) (%)]\n [" + sum + "명 / 20명] [" + Integer.toString(temp) + "%]");
                                 congestion.condition(Integer.parseInt(sum));
                                 count++;
                             }
-
 
                         } catch (Exception e)  //예외처리
                         {
@@ -207,6 +207,11 @@ public class MainActivity extends AppCompatActivity {
         new BackgroundTask().execute();
     }
 
+    /*
+    *백그라운드 프로세스를 커스터마이징 한 클래스
+    *데이터베이스에서 넘어오는 값을 스트림형태로 받아옴.
+    * PostExecute 함수를 통해 데이터베이스 값을 JAVA에 저장.
+     */
     class BackgroundTask extends AsyncTask<Void, Void, String> {
         String target;
         TextView TextView = findViewById(R.id.numbertext);
@@ -264,9 +269,16 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /*
+    *이것은 데이터베이스의 실시간 인원수(sum)를 바탕으로
+    * 나타내지는 UI
+    * 범위에 따라 다른 이미지가 나타나짐
+    *
+    * @Author Choo
+     */
     class Congestion {
         void condition(int sum) {
-            TextView TextView = findViewById(R.id.numbertext);
+            textView = findViewById(R.id.numbertext);
             ImageView[] imageViews = {findViewById(R.id.imageView1),
                     findViewById(R.id.imageView2),
                     findViewById(R.id.imageView3),
@@ -282,20 +294,20 @@ public class MainActivity extends AppCompatActivity {
             switch (temp) {
                 case 0:   //실제 인원: 16~20
                     imageViews[0].setVisibility(View.VISIBLE);
-                    //TextView.setTextColor(Color.parseColor("#ffcc0000")); //빨강
+                    textView.setTextColor(getResources().getColor(R.color.red)); //빨강
                     break;
                 case 1:   //11~15
                     imageViews[1].setVisibility(View.VISIBLE);
-                    //TextView.setTextColor(Color.parseColor("#ffff8800")); //빨강 ->주
+                    textView.setTextColor(getResources().getColor(R.color.brightred)); //주황
                     break;
                 case 2:   //6~10
                     imageViews[2].setVisibility(View.VISIBLE);
-                    //TextView.setTextColor(Color.parseColor("R.attr.colorPrimaryVariant")); //주황 ->파
+                    textView.setTextColor(getResources().getColor(R.color.blue)); //파랑
                     break;
                 case 3:   //1~5
                 case 4: // 0
                     imageViews[3].setVisibility(View.VISIBLE);
-                    //TextView.setTextColor(Color.parseColor("#ff669900"));
+                    textView.setTextColor(getResources().getColor(R.color.green));
                     break;
                 //초록
                 default:

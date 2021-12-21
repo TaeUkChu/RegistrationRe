@@ -2,12 +2,19 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@android:id/background">
         <shape
-            android:innerRadiusRatio="2.71"
-            android:thicknessRatio="7.6"
+            android:innerRadiusRatio="3.5"
+            android:thicknessRatio="10"
             android:shape="ring"
             android:useLevel="false"
             android:type="sweep">
             <solid android:color="#9E9E9E" />
+
+            <gradient
+                android:angle="0"
+                android:endColor="#F210e5"
+                android:startColor="#DD2C00"
+                android:type="linear"
+                ></gradient>
         </shape>
     </item>
 
@@ -16,12 +23,14 @@
             android:fromDegrees="270"
             android:toDegrees="270">
             <shape
-                android:innerRadiusRatio="2.71"
-                android:thicknessRatio="7.6"
+                android:innerRadiusRatio="3.5"
+                android:thicknessRatio="10"
                 android:shape="ring"
                 android:angle="0"
                 android:type="sweep">
             </shape>
+
+
         </rotate>
     </item>
 

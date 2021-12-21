@@ -189,13 +189,16 @@ class BackgroundTask2 extends AsyncTask<Void, Void, String>
             String userExpirationday = object.getString("userExpirationday");
             String userPeriod = object.getString("userPeriod");
             String remainingPeriod = object.getString("remainingPeriod");
-            float remainpercent = (float)(Integer.parseInt(remainingPeriod) / Integer.parseInt(userPeriod));
+            float remainpercent = ((float)(Integer.parseInt(remainingPeriod)) / ((float)Integer.parseInt(userPeriod)))*100;
+            String percent = String.format("%.2f",remainpercent);
 
             startText.setText("등록 날짜: " + userRegisterday);
             finishText.setText("만료 날짜: "+ userExpirationday);
-            remainText.setText("남은 기간: "+ remainingPeriod +"\n" + remainpercent +  "(%)");
+            remainText.setText("남은 기간: "+ remainingPeriod +"일\n" + percent +  "(%)");
 
-            progressBar.setProgress(Integer.parseInt(remainingPeriod));
+            int temp;
+            temp = Integer.parseInt(userPeriod) - Integer.parseInt(remainingPeriod);
+            progressBar.setProgress(temp);
             progressBar.setMax(Integer.parseInt(userPeriod));
         }catch(Exception e)
         {
