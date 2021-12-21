@@ -55,7 +55,7 @@
             android:layout_margin="20dp"
             android:drawableTop="@drawable/back"
             android:background="@android:color/transparent"
-            android:text="등 운동 \n 인원 확인"
+            android:text="등 운동"
             android:textSize="15dp"
             android:textColor="@color/black"
             android:textStyle="bold"/>

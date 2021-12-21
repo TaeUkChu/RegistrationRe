@@ -177,8 +177,8 @@ public class LoginActivity extends AppCompatActivity {
     public void onBackPressed() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
         builder.setMessage("종료하시겠습니까?");
-        builder.setPositiveButton("예",(dialog,which) -> {dialog.cancel();});
-        builder.setNegativeButton("아니오",(dialog,which) -> {finish();});
+        builder.setPositiveButton("예",(dialog,which) -> {finish();});
+        builder.setNegativeButton("아니오",(dialog,which) -> {dialog.cancel();});
         builder.show();
 
     }

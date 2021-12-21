@@ -4,6 +4,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.AsyncTask;
@@ -38,6 +39,8 @@ public class MainActivity extends AppCompatActivity {
     ImageView[] imageViews = new ImageView[5];
     TextView textView;
     Congestion congestion = new Congestion();
+    private Context mContext;
+    boolean checkEntrance;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,75 +57,100 @@ public class MainActivity extends AppCompatActivity {
         final Button CategoryButton = findViewById(R.id.CategoryButton);
         final TextView textView = findViewById(R.id.numbertext);
 
+
+        mContext = this;
         CongestionButton.setEnabled(false);
         PeriodButton.setEnabled(true);
         CategoryButton.setEnabled(true);
+        checkEntrance = false;
+        checkEntrance = PreferenceManager.getBoolean(mContext,"check");
+
+        Boolean check = PreferenceManager.getBoolean(mContext, "checkEntrance");
+
+        if (check) {
+            EntranceButton.setEnabled(false);
+            ExitButton.setEnabled(true);
+            //Toast.makeText(MainActivity.this, "이미 입장이 완료되었습니다.", Toast.LENGTH_SHORT).show();
+        }
+        else{
+            EntranceButton.setEnabled(true);
+            ExitButton.setEnabled(false);
+        }
 
         //입장하기 버튼 - 누르면 userID를 서버에 보내고 서버는 boolean값을 바꿔줌.
         EntranceButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                    //입장이 이미 되었다면
+                    Response.Listener<String> responseListener = new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            try {   //해당 결과 받아옴
+                                JSONObject jsonResponse = new JSONObject(response);
+                                boolean success = jsonResponse.getBoolean("success");
+
+                                if (success) {  //입장이 성공했을 때
+                                    Toast.makeText(MainActivity.this, "입장 완료", Toast.LENGTH_SHORT).show();
+                                    congestion.condition(Integer.parseInt(textView.getText().toString()));
+                                } else {
+                                    Toast.makeText(MainActivity.this, "네트워크 오류입니다.", Toast.LENGTH_SHORT).show();
+                                }
+                            } catch (Exception e)  //예외처리
+                            {
+                                e.printStackTrace();
+                            }
+                        }
+                    };
+                    // EntranceRequest 클래스의 queue 형태로 DB에 전달
+                    EntranceRequest EntranceRequest = new EntranceRequest(userID, responseListener);
+                    RequestQueue queue = Volley.newRequestQueue(MainActivity.this);  //큐에 담음
+                    queue.add(EntranceRequest);
+                EntranceButton.setEnabled(false);
+                ExitButton.setEnabled(true);
+                    PreferenceManager.setBoolean(mContext, "checkEntrance", true);
                 //결과 출력
-                Response.Listener<String> responseListener = new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        try {   //해당 결과 받아옴
-                            JSONObject jsonResponse = new JSONObject(response);
-                            boolean success = jsonResponse.getBoolean("success");
-
-                            if (success) {  //입장이 성공했을 때
-                                Toast.makeText(MainActivity.this, "입장 완료", Toast.LENGTH_SHORT).show();
-                                congestion.condition(Integer.parseInt(textView.getText().toString()));
-                            }
-                            else
-                                {
-                                Toast.makeText(MainActivity.this, "이미 입장이 완료되었습니다.", Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                        catch(Exception e)  //예외처리
-                                {
-                                    e.printStackTrace();
-                                }
-                            }
-                        } ;
-                        // EntranceRequest 클래스의 queue 형태로 DB에 전달
-                        EntranceRequest EntranceRequest = new EntranceRequest(userID, responseListener);
-                        RequestQueue queue = Volley.newRequestQueue(MainActivity.this);  //큐에 담음
-                        queue.add(EntranceRequest);
-                    }
-
+            }
         });
 
         //퇴장하기 버튼 (입장과 반대)
         ExitButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Response.Listener<String> responseListener = new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        try {   //해당 결과 받아옴
-                            JSONObject jsonResponse = new JSONObject(response);
-                            boolean success = jsonResponse.getBoolean("success");
-                            if (success) {  //퇴장이 성공했을 때
-                                AlertDialog.Builder builder2 = new AlertDialog.Builder(MainActivity.this);
-                                builder2.setMessage("퇴장 성공!\n 어플을 종료 하시겠습니까?.");
-                                builder2.setPositiveButton("예",(dialog,which) -> {finish();});
-                                builder2.setNegativeButton("아니오",(dialog,which) -> {dialog.cancel();});
-                                builder2.show();  //다이얼로그 실행
-                                congestion.condition(Integer.parseInt(textView.getText().toString()));
-                            } else {
-                                Toast.makeText(MainActivity.this, "이미 퇴장이 완료 되었습니다.", Toast.LENGTH_SHORT).show();
+                //Boolean check = PreferenceManager.getBoolean(mContext, "checkEntrance");
+                    Response.Listener<String> responseListener = new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            try {   //해당 결과 받아옴
+                                JSONObject jsonResponse = new JSONObject(response);
+                                boolean success = jsonResponse.getBoolean("success");
+                                if (success) {  //퇴장이 성공했을 때
+                                    AlertDialog.Builder builder2 = new AlertDialog.Builder(MainActivity.this);
+                                    builder2.setMessage("퇴장 성공!\n 어플을 종료 하시겠습니까?.");
+                                    builder2.setPositiveButton("예", (dialog, which) -> {
+                                        finish();
+                                    });
+                                    builder2.setNegativeButton("아니오", (dialog, which) -> {
+                                        dialog.cancel();
+                                    });
+                                    builder2.show();  //다이얼로그 실행
+                                    congestion.condition(Integer.parseInt(textView.getText().toString()));
+                                } else {
+                                    Toast.makeText(MainActivity.this, "네트워크 오류입니다.", Toast.LENGTH_SHORT).show();
+                                }
+                            } catch (Exception e)  //예외처리
+                            {
+                                e.printStackTrace();
                             }
-                        } catch (Exception e)  //예외처리
-                        {
-                            e.printStackTrace();
                         }
-                    }
-                };
-                // ExitRequest 클래스의 queue 형태로 DB에 전달
-                ExitRequest ExitRequest = new ExitRequest(userID, responseListener);
-                RequestQueue queue = Volley.newRequestQueue(MainActivity.this);  //큐에 담음
-                queue.add(ExitRequest);
-            }
+                    };
+                    // ExitRequest 클래스의 queue 형태로 DB에 전달
+                    ExitRequest ExitRequest = new ExitRequest(userID, responseListener);
+                    RequestQueue queue = Volley.newRequestQueue(MainActivity.this);  //큐에 담음
+                    queue.add(ExitRequest);
+                    EntranceButton.setEnabled(true);
+                     ExitButton.setEnabled(false);
+                    PreferenceManager.setBoolean(mContext, "checkEntrance", false);
+                }
         });
         //새로 고침 버튼을 이용한 데이터 요청 + 가져오기
 
@@ -327,6 +355,7 @@ public class MainActivity extends AppCompatActivity {
     public void onBackPressed() {
         Intent backintent = new Intent(MainActivity.this, LoginActivity.class);
         backintent.putExtra("userID",userID);
+        PreferenceManager.setBoolean(mContext, "checkEntrance", false);
         MainActivity.this.startActivity(backintent);
         finish();
     }
